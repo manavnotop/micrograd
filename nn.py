@@ -6,9 +6,12 @@ class Neuron:
         
     def __call__(self, x):
         #w * x + b
-        act  = sum((wi*xi for wi, xi in zip(self.w, x)), self.b) + self.b
+        act  = sum((wi*xi for wi, xi in zip(self.w, x)), self.b)
         out = act.tanh()
         return out
+    
+    def parameters(self):
+        return self.w + [self.b]
     
 class Layer:
     
@@ -17,7 +20,10 @@ class Layer:
         
     def __call__(self, x):
         out = [n(x) for n in self.neurons]
-        return out
+        return out[0] if len(out) == 1 else out
+    
+    def parameters(self):
+        return [p for neuron in self.neurons for p in neuron.parameters()]
         
 class MLP:
     
@@ -29,3 +35,6 @@ class MLP:
         for layer in self.layers:
             x = layer(x)
         return x
+    
+    def parameters(self):
+        return [p for layer in self.layers for p in layer.parameters()]
